@@ -1,34 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Sword,
     Target,
     TrendingUp,
-    AlertCircle,
     Zap,
-    ChevronRight,
-    Shield,
     Globe,
-    FileText,
-    ArrowRight,
     X,
     Sparkles,
-    Cpu,
     Target as TargetIcon,
-    BarChart3,
-    Activity,
     RefreshCw,
     Terminal
 } from 'lucide-react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    Cell
-} from 'recharts';
 import api from '../../lib/api';
 import { useDashboard } from '../../contexts/DashboardContext';
 
@@ -40,7 +23,6 @@ export const CompetitorTools = () => {
     const [domain, setDomain] = useState(state.competitors.domain);
     const [competitors, setCompetitors] = useState<string>(state.competitors.competitors?.join(', ') || '');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [results, setResults] = useState<any>(state.competitors.results[state.competitors.mode as keyof typeof state.competitors.results]);
     const [showBattlePlanModal, setShowBattlePlanModal] = useState(false);
     const [isDeploying, setIsDeploying] = useState(false);
@@ -97,7 +79,7 @@ export const CompetitorTools = () => {
         }, 1000);
     };
 
-    const handleAction = async (e: React.FormEvent) => {
+    const handleAction = async (e: FormEvent) => {
         e.preventDefault();
 
         const cacheKey = getCacheKey(domain, competitors, mode);
@@ -111,7 +93,6 @@ export const CompetitorTools = () => {
         }
 
         setLoading(true);
-        setError(null);
         setResults(null);
         setDeploymentSuccess(false);
         setExecutionLogs([]);
@@ -147,7 +128,7 @@ export const CompetitorTools = () => {
             setCompetitorState(data, domain, competitors.split(',').map(c => c.trim()).filter(c => c), mode);
             updateCache(domain, competitors, mode, data);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Analysis failed. Please check inputs and try again.');
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -172,7 +153,6 @@ export const CompetitorTools = () => {
                             onClick={() => {
                                 setMode(m);
                                 setCompetitorState(null, domain, competitors.split(',').map(c => c.trim()).filter(c => c), m);
-                                setError(null);
                             }}
                             className={`px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${mode === m ? 'bg-primary text-primary-foreground shadow-lg' : 'text-muted-foreground hover:bg-secondary'}`}
                         >

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Target,
@@ -40,7 +40,7 @@ export const KeywordTools = () => {
                 const cacheKey = getCacheKey(keyword, 'analyze');
                 if (!keywordCache.has(cacheKey)) {
                     // Trigger handleSearch if not in cache (simulating search form)
-                    const fakeEvent = { preventDefault: () => { } } as React.FormEvent;
+                    const fakeEvent = { preventDefault: () => { } } as FormEvent;
                     handleSearch(fakeEvent);
                 }
             }
@@ -60,7 +60,7 @@ export const KeywordTools = () => {
         });
     };
 
-    const handleSearch = async (e: React.FormEvent) => {
+    const handleSearch = async (e: FormEvent) => {
         e.preventDefault();
         if (!keyword) return;
 

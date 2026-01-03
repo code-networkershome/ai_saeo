@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import {
-    BarChart3,
     TrendingUp,
     Globe,
     Link2,
@@ -27,7 +26,6 @@ import {
     Area,
     BarChart,
     Bar,
-    Cell,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -37,9 +35,6 @@ import {
 import api from '../../lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDashboard } from '../../contexts/DashboardContext';
-
-
-const COLORS = ['#6366f1', '#22c55e', '#a855f7', '#f59e0b', '#ef4444'];
 
 // GSC Connection Prompt Modal
 const GSCPromptModal = ({ isOpen, onClose, onConnect }: { isOpen: boolean; onClose: () => void; onConnect: () => void }) => {
@@ -149,7 +144,7 @@ const ChartSkeleton = ({ title, subtitle }: { title: string; subtitle?: string }
         <div className="h-64 bg-gradient-to-br from-secondary/50 to-secondary/20 rounded-2xl flex items-center justify-center">
             <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                    <BarChart3 className="w-8 h-8 text-primary/50" />
+                    <TrendingUp className="w-8 h-8 text-primary/50" />
                 </div>
                 <p className="text-sm font-bold text-muted-foreground">Analyzing data...</p>
             </div>
@@ -210,7 +205,7 @@ export const AnalyticsDashboard = () => {
         window.location.href = `${api.defaults.baseURL}/auth/google/login`;
     };
 
-    const handleAnalyze = async (e: React.FormEvent) => {
+    const handleAnalyze = async (e: FormEvent) => {
         e.preventDefault();
         if (!domain) return;
 
@@ -785,7 +780,7 @@ export const AnalyticsDashboard = () => {
                     </motion.div>
                 ) : (
                     <div className="py-40 flex flex-col items-center justify-center text-center opacity-30 grayscale pointer-events-none">
-                        <BarChart3 className="w-24 h-24 mb-6" />
+                        <TrendingUp className="w-24 h-24 mb-6" />
                         <h2 className="text-3xl font-black tracking-tighter mb-2 uppercase">Neural Pipeline Ready</h2>
                         <p className="max-w-md text-sm font-bold uppercase tracking-widest">Enter a domain above to start comprehensive analysis.</p>
                     </div>

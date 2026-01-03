@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -84,7 +84,7 @@ export const ContentLab = () => {
         });
     };
 
-    const handleGenerate = async (e: React.FormEvent) => {
+    const handleGenerate = async (e: FormEvent) => {
         e.preventDefault();
 
         const cacheKey = getCacheKey(topic, keyword, activeTab, contentType);

@@ -1,6 +1,5 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Terminal, Bot, Zap, Shield, Cpu, Target, Sparkles } from 'lucide-react';
+import { ArrowRight, Terminal, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 

@@ -1,27 +1,19 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Globe,
     Search,
     Zap,
     Link as LinkIcon,
-    ChevronRight,
-    AlertCircle,
     CheckCircle2,
     BarChart3,
     X,
     Sparkles,
-    ShieldCheck,
     Cpu,
     RefreshCw,
-    ArrowRight,
     Activity,
     Target,
     TrendingUp,
-    Lock,
     Terminal,
-    Eye,
-    Bot
 } from 'lucide-react';
 import {
     BarChart,
@@ -44,18 +36,16 @@ export const AEODashboard = () => {
     const [brandName, setBrandName] = useState(state.aeo.input);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any>(state.aeo.results);
-    const [error, setError] = useState<string | null>(null);
     const [showPlaybookModal, setShowPlaybookModal] = useState(false);
     const [isExecuting, setIsExecuting] = useState(false);
     const [executionLogs, setExecutionLogs] = useState<string[]>([]);
     const [executionSuccess, setExecutionSuccess] = useState(false);
 
-    const handleCheckVisibility = async (e: React.FormEvent) => {
+    const handleCheckVisibility = async (e: FormEvent) => {
         e.preventDefault();
         if (!brandName) return;
 
         setLoading(true);
-        setError(null);
         setExecutionSuccess(false);
         try {
             const response = await api.post('/ai-visibility/check', { brand_name: brandName });
@@ -63,7 +53,6 @@ export const AEODashboard = () => {
             setResults(data);
             setAeoState(data, brandName);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Failed to check visibility. Please try again.');
             console.error(err);
         } finally {
             setLoading(false);

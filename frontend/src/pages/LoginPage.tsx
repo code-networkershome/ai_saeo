@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cpu, Mail, Lock, ArrowRight, CheckCircle2, UserPlus, LogIn, AlertCircle } from 'lucide-react';
+import { Cpu, Mail, Lock, CheckCircle2, UserPlus, LogIn, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
@@ -12,7 +12,7 @@ export const LoginPage = () => {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const navigate = useNavigate();
 
-    const handleAuth = async (e: React.FormEvent) => {
+    const handleAuth = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setMessage(null);

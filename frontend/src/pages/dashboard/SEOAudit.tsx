@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield,
@@ -164,7 +164,7 @@ export const SEOAudit = () => {
         setBulkLoading(false);
     };
 
-    const handleRunAudit = async (e: React.FormEvent) => {
+    const handleRunAudit = async (e: FormEvent) => {
         e.preventDefault();
         if (!url) return;
 
