@@ -1,0 +1,33 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+
+# Build Outputs
+dist/
+dist-ssr/
+*.egg-info/
+build/
+.next/
+out/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Static Credentials
+google-credentials.json
+
+# Vercel Configuration (Ignore local build outputs)
+.vercel/
