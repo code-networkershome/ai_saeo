@@ -17,7 +17,9 @@ import {
     ExternalLink,
     AlertCircle,
     TrendingUp,
-    Copy
+    Copy,
+    Globe,
+    RefreshCw
 } from 'lucide-react';
 import {
     PieChart,
@@ -35,7 +37,6 @@ export const SEOAudit = () => {
     const [url, setUrl] = useState(state.audit.input);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any>(state.audit.results);
-    const [error, setError] = useState<string | null>(null);
     const [selectedIssue, setSelectedIssue] = useState<any>(null);
     const [showFixesModal, setShowFixesModal] = useState(false);
     const [aiExplanation, setAiExplanation] = useState<any>(null);
@@ -168,14 +169,13 @@ export const SEOAudit = () => {
         if (!url) return;
 
         setLoading(true);
-        setError(null);
         try {
             const response = await api.post('/audit/full', { url });
             const data = response.data.data;
             setResults(data);
             setAuditState(data, url);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Failed to start audit. Please verify the URL and try again.');
+            console.error('Audit failed:', err);
         } finally {
             setLoading(false);
         }
@@ -533,7 +533,6 @@ export const SEOAudit = () => {
                                 {activeSection === 'security' && (() => {
                                     const securityData = results.business_intelligence?.security;
                                     const hasSecurityData = securityData && securityData.checks && Object.keys(securityData.checks).length > 0;
-                                    const securityScore = securityData?.security_score ?? 0;
 
                                     // Define headers with their check results
                                     const headers = hasSecurityData ? [
@@ -1179,5 +1178,3 @@ export const SEOAudit = () => {
         </div>
     );
 };
-
-import { Globe, RefreshCw } from 'lucide-react';

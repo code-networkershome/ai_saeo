@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Search,
-    TrendingUp,
-    BarChart3,
     Target,
     Zap,
-    ChevronRight,
     SearchCode,
     PieChart,
     MousePointer2,
     Layers,
-    ArrowUpRight,
-    Download,
-    AlertCircle,
     X,
-    Sparkles,
-    FileText,
-    Tag,
     Globe,
     Cpu,
     ArrowRight,
@@ -29,15 +18,12 @@ import api from '../../lib/api';
 import { useDashboard } from '../../contexts/DashboardContext';
 
 export const KeywordTools = () => {
-    const navigate = useNavigate();
-    const { state, setKeywordState, setContentState } = useDashboard();
+    const { state, setKeywordState } = useDashboard();
     const [keyword, setKeyword] = useState(state.keywords.input);
     const [mode, setMode] = useState<'discover' | 'analyze'>(state.keywords.mode);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any>(state.keywords.results[state.keywords.mode]);
-    const [error, setError] = useState<string | null>(null);
     const [selectedKeyword, setSelectedKeyword] = useState<any>(null);
-    const [showStrategyModal, setShowStrategyModal] = useState(false);
 
     // Keyword Response Cache
     const [keywordCache, setKeywordCache] = useState<Map<string, any>>(new Map());
@@ -89,7 +75,6 @@ export const KeywordTools = () => {
         }
 
         setLoading(true);
-        setError(null);
         try {
             const endpoint = mode === 'discover' ? '/keywords/discover' : '/keywords/analyze';
             const payload = mode === 'discover' ? { seed_keyword: keyword } : { keyword };
@@ -99,7 +84,6 @@ export const KeywordTools = () => {
             setKeywordState(data, keyword, mode);
             updateCache(keyword, mode, data);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Failed to fetch keyword data. Please try again.');
             console.error(err);
         } finally {
             setLoading(false);
