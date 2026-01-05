@@ -206,5 +206,5 @@ async def api_status():
         }
     }
 
-# Expose the app object for Vercel
-handler = app
+# FastAPI application instance for Vercel (ASGI)
+# Do not add 'handler' alias as it conflicts with Vercel's legacy CGI detection
