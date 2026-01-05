@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Bell, Search, Sparkles } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { ChatAssistant } from './ChatAssistant';
 
 export const DashboardLayout = () => {
     const { user } = useAuth();
@@ -67,6 +68,9 @@ export const DashboardLayout = () => {
                         <Outlet />
                     </div>
                 </main>
+
+                {/* Chat Assistant */}
+                <ChatAssistant />
 
                 {/* Footer Status Bar */}
                 <footer className="h-10 border-t border-border/40 bg-card/10 backdrop-blur-md px-6 flex items-center justify-between text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">

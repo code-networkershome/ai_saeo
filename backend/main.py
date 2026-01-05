@@ -21,7 +21,8 @@ from app.api.routes import (
     research,
     edge,
     analytics,
-    auth
+    auth,
+    chat
 )
 
 # Configure logging
@@ -157,6 +158,13 @@ app.include_router(
     auth.router,
     prefix=f"{settings.API_PREFIX}",
     tags=["🔑 Authentication"]
+)
+
+
+app.include_router(
+    chat.router,
+    prefix=f"{settings.API_PREFIX}/chat",
+    tags=["🤖 Chat Assistant"]
 )
 
 

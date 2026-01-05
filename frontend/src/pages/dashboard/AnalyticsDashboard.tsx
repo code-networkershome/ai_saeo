@@ -245,6 +245,9 @@ export const AnalyticsDashboard = () => {
             setData(analyticsData);
             setAnalyticsState(analyticsData, domain);
 
+            // Persist for Co-Pilot context
+            localStorage.setItem('last_analyzed_domain', domain);
+
             // Mark as shown for this session so we don't nag
             sessionStorage.setItem('gsc_prompt_shown', 'true');
         } catch (err) {
