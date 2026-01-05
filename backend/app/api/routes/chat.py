@@ -73,14 +73,28 @@ async def chat_with_assistant(request: ChatRequest):
         """
 
         client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        completion = await client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": request.message}
-            ],
-            temperature=0.7
-        )
+        
+        try:
+            # Try GPT-4o first as requested
+            completion = await client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": request.message}
+                ],
+                temperature=0.7
+            )
+        except Exception as e:
+            logger.warning(f"GPT-4o unavailable, falling back to mini: {e}")
+            # Fallback to mini if account doesn't support 4o or is over limit
+            completion = await client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": request.message}
+                ],
+                temperature=0.7
+            )
 
         ai_response = completion.choices[0].message.content
         sources = [item.get('name', 'General Insight') for item in context_items]

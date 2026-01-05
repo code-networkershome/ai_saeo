@@ -36,10 +36,11 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose })
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setIsLoading(true);
 
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000/api/v1' : '/api/v1');
+        const apiUrl = import.meta.env.VITE_API_BASE_URL ||
+            (window.location.hostname === 'localhost' ? 'http://localhost:8000/api/v1' : '/api/v1');
 
         try {
-            const response = await fetch(`${apiUrl}/chat/`, {
+            const response = await fetch(`${apiUrl.replace(/\/$/, '')}/chat/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,11 +51,19 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose })
                 }),
             });
 
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Server error: ${response.status}`);
+            }
+
             const data = await response.json();
             setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Chat failed:', error);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I\'m having trouble connecting to my brain right now. Please try again later.' }]);
+            const errorMsg = error.message?.includes('Failed to fetch')
+                ? 'Connection lost. Please ensure your backend is live and configured in Vercel environment variables.'
+                : `Precision Error: ${error.message}`;
+            setMessages(prev => [...prev, { role: 'assistant', content: errorMsg }]);
         } finally {
             setIsLoading(false);
         }
