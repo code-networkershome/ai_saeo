@@ -8,11 +8,11 @@ interface Message {
 }
 
 interface ChatAssistantProps {
-    // No external props for managing open/close state
+    isOpen: boolean;
+    onClose: () => void;
 }
 
-export const ChatAssistant: React.FC<ChatAssistantProps> = () => {
-    const [isOpen, setIsOpen] = useState(false); // Internal state for managing visibility
+export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose }) => {
     const [messages, setMessages] = useState<Message[]>([
         { role: 'assistant', content: 'Hi! I\'m your SAEO Intelligence Assistant. I can answer questions about your previous audits, visibility trends, or general AEO strategies. How can I help today?' }
     ]);
