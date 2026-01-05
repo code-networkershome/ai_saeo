@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 from app.core.config import settings
 import logging
 
-router = APIRouter(prefix="/chat", tags=["🤖 Chat Assistant"])
+router = APIRouter(tags=["🤖 Chat Assistant"])
 logger = logging.getLogger(__name__)
 
 class ChatRequest(BaseModel):
