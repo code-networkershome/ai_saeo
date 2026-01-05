@@ -48,6 +48,15 @@ export const SEOAudit = () => {
     // UI States
     const [activeSection, setActiveSection] = useState<'overview' | 'technical' | 'performance' | 'security' | 'intelligence'>('overview');
 
+    // Helper to safely render values that might be objects (prevents React child error)
+    const safeRender = (value: any): string => {
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+        if (typeof value === 'object') return JSON.stringify(value, null, 2);
+        return String(value);
+    };
+
     // Helper to get cache key for an issue
     const getIssueKey = (issue: any) => `${issue.title}-${issue.category}`;
 
@@ -948,7 +957,7 @@ export const SEOAudit = () => {
                                         {/* AI Explanation */}
                                         <div className="p-4 rounded-2xl bg-secondary/20 border border-border/30">
                                             <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">AI Analysis</h3>
-                                            <p className="text-sm leading-relaxed">{aiExplanation.explanation}</p>
+                                            <p className="text-sm leading-relaxed">{safeRender(aiExplanation.explanation)}</p>
                                         </div>
 
                                         {/* Step-by-Step Fix Instructions */}
@@ -960,7 +969,7 @@ export const SEOAudit = () => {
                                                         <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                                                             <span className="text-[10px] font-black text-primary">{idx + 1}</span>
                                                         </div>
-                                                        <p className="text-sm">{step}</p>
+                                                        <p className="text-sm">{safeRender(step)}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -983,7 +992,7 @@ export const SEOAudit = () => {
                                                     </button>
                                                 </div>
                                                 <pre className="p-4 bg-black/80 text-green-400 text-xs overflow-x-auto font-mono leading-relaxed">
-                                                    <code>{aiExplanation.code_snippet}</code>
+                                                    <code>{safeRender(aiExplanation.code_snippet)}</code>
                                                 </pre>
                                             </div>
                                         )}
@@ -1105,14 +1114,14 @@ export const SEOAudit = () => {
                                         </div>
 
                                         {/* Explanation */}
-                                        <p className="text-sm text-muted-foreground mb-4">{item.explanation.explanation}</p>
+                                        <p className="text-sm text-muted-foreground mb-4">{safeRender(item.explanation.explanation)}</p>
 
                                         {/* Steps */}
                                         <div className="mb-4 space-y-2">
                                             {(item.explanation.fix_steps || []).map((step: string, sIdx: number) => (
                                                 <div key={sIdx} className="flex items-start gap-2 text-sm">
                                                     <span className="text-primary font-black">{sIdx + 1}.</span>
-                                                    <span>{step}</span>
+                                                    <span>{safeRender(step)}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -1131,7 +1140,7 @@ export const SEOAudit = () => {
                                                     </button>
                                                 </div>
                                                 <pre className="p-3 bg-black/80 text-green-400 text-[10px] overflow-x-auto font-mono">
-                                                    <code>{item.explanation.code_snippet}</code>
+                                                    <code>{safeRender(item.explanation.code_snippet)}</code>
                                                 </pre>
                                             </div>
                                         )}

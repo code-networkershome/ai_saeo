@@ -80,18 +80,32 @@ class GoogleMetricsService:
 
     async def handle_callback(self, code: str, redirect_uri: str):
         """Exchange auth code for tokens"""
-        flow = Flow.from_client_secrets_file(
-            self.creds_path,
-            scopes=SCOPES,
-            redirect_uri=redirect_uri
-        )
-        flow.fetch_token(code=code)
-        self.credentials = flow.credentials
-        
-        with open(self.token_path, "w") as f:
-            f.write(self.credentials.to_json())
-        
-        return True
+        try:
+            if self.client_config:
+                flow = Flow.from_client_config(
+                    self.client_config,
+                    scopes=SCOPES,
+                    redirect_uri=redirect_uri
+                )
+            else:
+                flow = Flow.from_client_secrets_file(
+                    self.creds_path,
+                    scopes=SCOPES,
+                    redirect_uri=redirect_uri
+                )
+            
+            flow.fetch_token(code=code)
+            self.credentials = flow.credentials
+            
+            # Persist tokens
+            with open(self.token_path, "w") as f:
+                f.write(self.credentials.to_json())
+            
+            logger.info("Successfully exchanged code for Google tokens.")
+            return True
+        except Exception as e:
+            logger.error(f"Google callback failed: {e}")
+            return False
 
     async def get_gsc_data(self, domain: str) -> Dict[str, Any]:
         """Fetch keyword impression and click data from Search Console"""
@@ -108,25 +122,52 @@ class GoogleMetricsService:
                 
             service = build('searchconsole', 'v1', credentials=self.credentials)
             
-            # Normalize site URL for GSC (needs protocol)
-            site_url = domain if domain.startswith('http') else f"https://{domain}"
-            if not site_url.endswith('/'): site_url += '/'
+            # Normalize site URL for GSC (needs protocol or sc-domain: prefix)
+            # We'll try a few variations to find the right property
+            from datetime import datetime, timedelta
+            end_date = datetime.now().strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
             
-            request = {
-                'startDate': '2023-12-01', # Example range
-                'endDate': '2024-01-01',
-                'dimensions': ['query'],
-                'rowLimit': 10
-            }
+            possible_urls = [
+                f"https://{domain}/",
+                f"https://www.{domain}/",
+                f"sc-domain:{domain}"
+            ]
             
-            response = service.searchanalytics().query(siteUrl=site_url, body=request).execute()
+            response = None
+            last_err = None
+            
+            service = build('searchconsole', 'v1', credentials=self.credentials)
+            
+            for site_url in possible_urls:
+                try:
+                    request = {
+                        'startDate': start_date,
+                        'endDate': end_date,
+                        'dimensions': ['query'],
+                        'rowLimit': 25
+                    }
+                    response = service.searchanalytics().query(siteUrl=site_url, body=request).execute()
+                    if response:
+                        logger.info(f"Successfully fetched GSC data for {site_url}")
+                        break
+                except Exception as e:
+                    last_err = str(e)
+                    continue
+            
+            if not response:
+                return {
+                    "status": "error",
+                    "message": f"Could not find a GSC property for {domain}. Last error: {last_err}"
+                }
+
             rows = response.get('rows', [])
             
             return {
                 "status": "success",
                 "total_clicks": sum(r.get('clicks', 0) for r in rows),
                 "total_impressions": sum(r.get('impressions', 0) for r in rows),
-                "top_queries": rows[:5]
+                "top_queries": rows
             }
         except Exception as e:
             logger.error(f"Failed to fetch GSC data: {e}")

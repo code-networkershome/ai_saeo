@@ -42,12 +42,15 @@ class Settings(BaseSettings):
     SUPABASE_KEY: Optional[str] = None
     
     # Optional Additional APIs
-    HUGGINGFACE_API_KEY: Optional[str] = None
     PAGESPEED_API_KEY: Optional[str] = None
     SERPAPI_KEY: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
     GOOGLE_CREDENTIALS_JSON: Optional[str] = None
     GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
+    FRONTEND_URL: str = "http://localhost:5173"
+    
+    # New Free APIs for Accurate Metrics
+    OPENPAGERANK_API_KEY: Optional[str] = None  # Get free key at openpagerank.com
     
     # Rate Limiting
     RATE_LIMIT_PER_MINUTE: int = 60

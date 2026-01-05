@@ -1,53 +1,42 @@
 """
 RAG Engine Service
-Handles semantic embeddings via Hugging Face Inference API and vector search in Supabase
+Handles semantic embeddings via OpenAI and vector search in Supabase
 """
 
-import httpx
 import logging
 from typing import List, Dict, Any, Optional
+from openai import AsyncOpenAI
 from app.core.config import settings
 from app.core.database import get_supabase
 
 logger = logging.getLogger(__name__)
 
-# Recommended Hugging Face router endpoint for feature extraction
-HF_API_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2/pipeline/feature-extraction"
-
 class RAGEngineService:
-    """Service for Retrieval-Augmented Generation using Hugging Face and Supabase"""
+    """Service for Retrieval-Augmented Generation using OpenAI and Supabase Vector"""
     
     def __init__(self):
-        self.hf_token = getattr(settings, "HUGGINGFACE_API_KEY", None)
-        self.headers = {"Authorization": f"Bearer {self.hf_token}"} if self.hf_token else {}
+        self._client = None
+
+    @property
+    def client(self):
+        """Lazy initialization of OpenAI client"""
+        if self._client is None and settings.OPENAI_API_KEY:
+            self._client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        return self._client
 
     async def get_embedding(self, text: str) -> List[float]:
-        """Get embedding for a text string using Hugging Face Inference API"""
-        if not text:
+        """Get embedding for a text string using OpenAI"""
+        if not text or not self.client:
             return []
 
         try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                response = await client.post(
-                    HF_API_URL,
-                    headers=self.headers,
-                    json={"inputs": text, "options": {"wait_for_model": True}}
-                )
-                
-                if response.status_code == 200:
-                    embedding = response.json()
-                    # HF returns a list of floats for a single string input in this pipeline
-                    if isinstance(embedding, list) and len(embedding) > 0:
-                        # If batch, it might be [[...]], for single it's [...]
-                        if isinstance(embedding[0], list):
-                            return embedding[0]
-                        return embedding
-                    return []
-                
-                logger.error(f"Hugging Face API error: {response.status_code} - {response.text}")
-                return []
+            response = await self.client.embeddings.create(
+                model="text-embedding-3-small",
+                input=text.replace("\n", " ")
+            )
+            return response.data[0].embedding
         except Exception as e:
-            logger.error(f"Failed to get embedding: {e}")
+            logger.error(f"Failed to get embedding from OpenAI: {e}")
             return []
 
     async def store_knowledge(self, name: str, facts: Dict[str, Any], entity_type: str = "Insight"):
@@ -57,7 +46,6 @@ class RAGEngineService:
             return None
 
         # Create search text from facts and name
-        # We prioritize name, type, and key metrics in the search text
         facts_summary = f"Type: {entity_type}, Facts: {str(facts)}"
         search_text = f"{name}: {facts_summary}"
         embedding = await self.get_embedding(search_text)
@@ -66,7 +54,8 @@ class RAGEngineService:
             "name": name,
             "type": entity_type,
             "facts": facts,
-            "embedding": embedding if embedding else None
+            "embedding": embedding if embedding else None,
+            "updated_at": "now()"
         }
 
         try:
@@ -90,7 +79,7 @@ class RAGEngineService:
             return []
 
         embedding = await self.get_embedding(query)
-        if not embedding or len(embedding) == 0:
+        if not embedding:
             return []
 
         try:
@@ -106,8 +95,8 @@ class RAGEngineService:
             
             return result.data or []
         except Exception as e:
-            logger.warn(f"Vector search failed (RPC 'match_entities' might be missing): {e}")
-            # Fallback to basic keyword search if RPC fails
+            logger.warning(f"Vector search failed: {e}")
+            # Fallback to basic keyword search
             result = supabase.table("knowledge_entities").select("*").ilike("name", f"%{query}%").limit(limit).execute()
             return result.data or []
 

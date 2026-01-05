@@ -2,13 +2,11 @@ import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
-    Zap,
     Link as LinkIcon,
     CheckCircle2,
     BarChart3,
     X,
     Sparkles,
-    Cpu,
     RefreshCw,
     Activity,
     Target,
@@ -25,7 +23,8 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Cell
+    Cell,
+    LabelList
 } from 'recharts';
 import api from '../../lib/api';
 
@@ -37,16 +36,12 @@ export const AEODashboard = () => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState<any>(state.aeo.results);
     const [showPlaybookModal, setShowPlaybookModal] = useState(false);
-    const [isExecuting, setIsExecuting] = useState(false);
-    const [executionLogs, setExecutionLogs] = useState<string[]>([]);
-    const [executionSuccess, setExecutionSuccess] = useState(false);
 
     const handleCheckVisibility = async (e: FormEvent) => {
         e.preventDefault();
         if (!brandName) return;
 
         setLoading(true);
-        setExecutionSuccess(false);
         try {
             const response = await api.post('/ai-visibility/check', { brand_name: brandName });
             const data = response.data.data;
@@ -56,39 +51,6 @@ export const AEODashboard = () => {
             console.error(err);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleExecutePlaybook = async () => {
-        if (!results?.aeo_playbook) return;
-        setIsExecuting(true);
-        setExecutionSuccess(false);
-        setExecutionLogs(["Initializing AEO Execution Agent...", `Target: ${brandName}`]);
-
-        try {
-            const response = await api.post('/ai-visibility/execute', {
-                brand_name: brandName,
-                playbook_items: results.aeo_playbook
-            });
-
-            const logs = response.data.data.logs || [];
-
-            let i = 0;
-            const logInterval = setInterval(() => {
-                if (i < logs.length) {
-                    setExecutionLogs(prev => [...prev, logs[i]]);
-                    i++;
-                } else {
-                    clearInterval(logInterval);
-                    setIsExecuting(false);
-                    setExecutionSuccess(true);
-                }
-            }, 1000);
-
-        } catch (err) {
-            console.error("Playbook execution failed", err);
-            setExecutionLogs(prev => [...prev, "Critical Failure: Handshake timeout.", "Reverting changes..."]);
-            setIsExecuting(false);
         }
     };
 
@@ -207,8 +169,15 @@ export const AEODashboard = () => {
                                                     { fill: '#f59e0b' },
                                                     { fill: '#a855f7' },
                                                 ]).map((entry: any, index: number) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                                    <Cell key={`cell-platform-${index}`} fill={entry.fill} />
                                                 ))}
+                                                <LabelList
+                                                    dataKey="mentions"
+                                                    position="right"
+                                                    formatter={(v: any) => v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v}
+                                                    style={{ fill: '#888', fontSize: '9px', fontWeight: 'bold' }}
+                                                    offset={10}
+                                                />
                                             </Bar>
                                         </BarChart>
                                     </ResponsiveContainer>
@@ -323,8 +292,8 @@ export const AEODashboard = () => {
                                         onClick={() => setShowPlaybookModal(true)}
                                         className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
                                     >
-                                        <Zap className="w-4 h-4 fill-current" />
-                                        Launch Optimization Playbook
+                                        <Sparkles className="w-4 h-4 fill-current" />
+                                        Access AEO Roadmap
                                     </button>
                                 </div>
                             </div>
@@ -371,44 +340,69 @@ export const AEODashboard = () => {
                             <div className="p-8 border-b border-border/40 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="p-3 rounded-2xl bg-primary/10 text-primary">
-                                        <Cpu className="w-6 h-6" />
+                                        <Activity className="w-6 h-6" />
                                     </div>
-                                    <h2 className="text-2xl font-black tracking-tight">Autonomous Visibility Agent</h2>
+                                    <div>
+                                        <h2 className="text-2xl font-black tracking-tight">AEO Optimization Roadmap</h2>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Strategic Fixes for Neural Prominence</p>
+                                    </div>
                                 </div>
                                 <button onClick={() => setShowPlaybookModal(false)} className="p-2 hover:bg-secondary rounded-xl transition-all"><X className="w-6 h-6" /></button>
                             </div>
 
-                            <div className="p-8 overflow-y-auto custom-scrollbar space-y-8 flex-1">
-                                {executionLogs.length > 0 && (
-                                    <div className="bg-black text-green-500 p-6 rounded-2xl font-mono text-[11px] border border-green-500/20 shadow-2xl">
-                                        <div className="flex items-center gap-2 mb-4 border-b border-green-500/20 pb-2">
-                                            <Terminal className="w-4 h-4" />
-                                            <span className="font-bold">AGENT EXECUTION_LOG</span>
-                                        </div>
-                                        {executionLogs.map((log, l) => <div key={l} className="mb-1">{">"} {log}</div>)}
-                                        {isExecuting && <div className="animate-pulse">_</div>}
-                                    </div>
-                                )}
+                            <div className="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1">
 
-                                <div className="space-y-4">
-                                    {(results?.aeo_playbook || results?.recommendations || []).map((item: any, i: number) => (
-                                        <div key={i} className="premium-card bg-secondary/10 border-border/50">
-                                            <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-3">{typeof item === 'string' ? item : (item.title || item.issue)}</h3>
-                                            <p className="text-xs font-medium text-muted-foreground leading-relaxed italic">{item.recommendation || item}</p>
-                                        </div>
-                                    ))}
+                                <div className="space-y-6">
+                                    {(results?.aeo_playbook || []).length > 0 ? (
+                                        (results?.aeo_playbook).map((item: any, i: number) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ y: 20, opacity: 0 }}
+                                                animate={{ y: 0, opacity: 1 }}
+                                                transition={{ delay: i * 0.1 }}
+                                                className="premium-card bg-secondary/10 border-border/50 hover:bg-secondary/20 transition-all p-6"
+                                            >
+                                                <div className="flex items-start gap-4 mb-4">
+                                                    <div className="mt-1 w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 border border-primary/20">
+                                                        {i + 1}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-sm font-black uppercase tracking-wider text-primary mb-2">
+                                                            {item.task || "Optimization Required"}
+                                                        </h3>
+                                                        <p className="text-xs font-medium text-white/80 leading-relaxed">
+                                                            {item.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-black/40 rounded-2xl p-4 border border-white/5">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Terminal className="w-3 h-3 text-primary/60" />
+                                                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-[0.2em]">How to Fix / Implement</span>
+                                                    </div>
+                                                    <p className="text-[11px] font-mono text-muted-foreground leading-relaxed">
+                                                        {item.how_to}
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        ))
+                                    ) : (
+                                        <div className="p-10 text-center opacity-40 italic text-xs">Compiling strategic AEO roadmap...</div>
+                                    )}
                                 </div>
                             </div>
 
                             <div className="p-8 border-t border-border/40 bg-secondary/5 flex gap-4">
-                                <button onClick={() => setShowPlaybookModal(false)} className="px-8 py-3 rounded-2xl bg-background border border-border/50 text-xs font-black uppercase tracking-widest">Dismiss</button>
+                                <button onClick={() => setShowPlaybookModal(false)} className="flex-1 px-8 py-4 rounded-2xl bg-background border border-border/50 text-xs font-black uppercase tracking-widest hover:bg-secondary transition-all">
+                                    Close Roadmap
+                                </button>
                                 <button
-                                    onClick={handleExecutePlaybook}
-                                    disabled={isExecuting || executionSuccess}
-                                    className="flex-1 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                    onClick={() => window.print()}
+                                    className="px-10 bg-primary text-primary-foreground py-4 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all flex items-center justify-center gap-3"
                                 >
-                                    {isExecuting ? <RefreshCw className="w-5 h-5 animate-spin" /> : executionSuccess ? <CheckCircle2 className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-                                    {isExecuting ? 'Agent Syncing...' : executionSuccess ? 'Campaign Deployed' : 'Deploy Visibility Campaign'}
+                                    <TrendingUp className="w-5 h-5" />
+                                    Download Roadmap
                                 </button>
                             </div>
                         </motion.div>

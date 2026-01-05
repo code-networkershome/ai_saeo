@@ -37,7 +37,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useDashboard } from '../../contexts/DashboardContext';
 
 // GSC Connection Prompt Modal
-const GSCPromptModal = ({ isOpen, onClose, onConnect }: { isOpen: boolean; onClose: () => void; onConnect: () => void }) => {
+const GSCPromptModal = ({ isOpen, onClose, onConnect, onContinue }: { isOpen: boolean; onClose: () => void; onConnect: () => void; onContinue: () => void }) => {
     if (!isOpen) return null;
 
     return (
@@ -46,55 +46,66 @@ const GSCPromptModal = ({ isOpen, onClose, onConnect }: { isOpen: boolean; onClo
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md px-4"
                 onClick={onClose}
             >
                 <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}
-                    className="relative w-full max-w-md p-8 bg-background border border-border/50 rounded-3xl shadow-2xl"
+                    initial={{ y: 50, scale: 0.95, opacity: 0 }}
+                    animate={{ y: 0, scale: 1, opacity: 1 }}
+                    exit={{ y: 50, scale: 0.95, opacity: 0 }}
+                    className="relative w-full max-w-lg p-10 bg-background/90 border border-white/10 rounded-[40px] shadow-[0_0_100px_rgba(59,130,246,0.15)] overflow-hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
+                    {/* Background Glow */}
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
+                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full" />
+
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 p-2 rounded-xl hover:bg-secondary transition-colors"
+                        className="absolute top-6 right-6 p-2 rounded-2xl hover:bg-secondary transition-all"
                     >
                         <X className="w-5 h-5" />
                     </button>
 
-                    <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center">
-                            <Database className="w-8 h-8 text-white" />
+                    <div className="text-center relative z-10">
+                        <div className="w-24 h-24 mx-auto mb-8 rounded-[30px] bg-gradient-to-br from-blue-500 via-indigo-500 to-emerald-500 p-[2px] shadow-2xl shadow-blue-500/20">
+                            <div className="w-full h-full bg-background rounded-[28px] flex items-center justify-center">
+                                <Database className="w-10 h-10 text-primary" />
+                            </div>
                         </div>
 
-                        <h2 className="text-2xl font-black tracking-tight mb-2">Unlock Real Data</h2>
-                        <p className="text-muted-foreground mb-6">
-                            Connect Google Search Console to see <span className="text-primary font-bold">real keywords</span>,
-                            <span className="text-primary font-bold"> actual traffic</span>, and <span className="text-primary font-bold">true rankings</span> for your domain.
+                        <h2 className="text-3xl font-black tracking-tighter mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent italic">
+                            Elevate Data Precision
+                        </h2>
+
+                        <p className="text-muted-foreground text-lg leading-relaxed mb-10 px-4">
+                            Connect your <span className="text-white font-bold">Search Console</span> for verified metrics, or proceed with our <span className="text-primary font-bold italic">Neural Intelligence Engine</span>.
                         </p>
 
-                        <div className="space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button
                                 onClick={onConnect}
-                                className="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-xl font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2"
+                                className="group relative py-5 px-8 bg-white text-black rounded-3xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-[0_10px_40px_rgba(255,255,255,0.1)] flex items-center justify-center gap-3"
                             >
-                                <ShieldCheck className="w-4 h-4" />
-                                Connect Google Search Console
+                                <ShieldCheck className="w-5 h-5" />
+                                <span>Connect real data</span>
+                                <div className="absolute inset-0 rounded-3xl bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
 
                             <button
-                                onClick={onClose}
-                                className="w-full py-3 px-6 bg-secondary/50 text-muted-foreground rounded-xl font-bold uppercase tracking-widest hover:bg-secondary transition-all flex items-center justify-center gap-2"
+                                onClick={onContinue}
+                                className="group py-5 px-8 bg-secondary/50 backdrop-blur-sm text-muted-foreground border border-white/5 rounded-3xl font-black uppercase tracking-widest text-xs hover:bg-secondary hover:text-white transition-all flex items-center justify-center gap-3"
                             >
-                                <Zap className="w-4 h-4" />
-                                Continue with AI Estimates
+                                <Zap className="w-5 h-5 text-amber-400" />
+                                <span>Use AI Estimates</span>
                             </button>
                         </div>
 
-                        <p className="text-[10px] text-muted-foreground mt-4 uppercase tracking-widest">
-                            AI estimates are based on industry benchmarks and may differ from actual data
-                        </p>
+                        <div className="mt-8 pt-8 border-t border-white/5">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] font-black opacity-50">
+                                Powered by Antigravity Neural SEO Engine
+                            </p>
+                        </div>
                     </div>
                 </motion.div>
             </motion.div>
@@ -198,19 +209,35 @@ export const AnalyticsDashboard = () => {
                 setCheckLoading(false);
             }
         };
-        checkGoogle();
+
+        // Check for GSC status in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('gsc') === 'success') {
+            // Success! We can clear the param and show a state update
+            window.history.replaceState({}, '', window.location.pathname);
+            checkGoogle();
+        } else {
+            checkGoogle();
+        }
     }, []);
 
     const handleConnectGoogle = () => {
         window.location.href = `${api.defaults.baseURL}/auth/google/login`;
     };
 
-    const handleAnalyze = async (e: FormEvent) => {
-        e.preventDefault();
+    const handleAnalyze = async (e?: FormEvent, bypassModal: boolean = false) => {
+        if (e) e.preventDefault();
         if (!domain) return;
+
+        // INTERCEPTOR: Show GSC prompt BEFORE computing if not connected
+        if (!googleStatus.is_connected && !bypassModal && !sessionStorage.getItem('gsc_prompt_shown')) {
+            setShowGSCPrompt(true);
+            return;
+        }
 
         setLoading(true);
         setData(null); // Clear previous data
+        setShowGSCPrompt(false); // Ensure modal is closed if triggered by it
 
         try {
             const response = await api.post('/analytics/full', { domain });
@@ -218,11 +245,8 @@ export const AnalyticsDashboard = () => {
             setData(analyticsData);
             setAnalyticsState(analyticsData, domain);
 
-            // Show GSC prompt if not connected (only show once per session)
-            if (analyticsData.gsc_status === 'not_connected' && !sessionStorage.getItem('gsc_prompt_shown')) {
-                setShowGSCPrompt(true);
-                sessionStorage.setItem('gsc_prompt_shown', 'true');
-            }
+            // Mark as shown for this session so we don't nag
+            sessionStorage.setItem('gsc_prompt_shown', 'true');
         } catch (err) {
             console.error('Analytics fetch failed', err);
         } finally {
@@ -273,6 +297,7 @@ export const AnalyticsDashboard = () => {
                 isOpen={showGSCPrompt}
                 onClose={() => setShowGSCPrompt(false)}
                 onConnect={handleConnectGoogle}
+                onContinue={() => handleAnalyze(undefined, true)}
             />
 
             <div className="space-y-10">
@@ -416,10 +441,10 @@ export const AnalyticsDashboard = () => {
                                                 </defs>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                                                 <XAxis dataKey="month" stroke="#888" fontSize={11} tickLine={false} />
-                                                <YAxis stroke="#888" fontSize={11} tickLine={false} tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : `${(v / 1000).toFixed(0)}K`} />
+                                                <YAxis stroke="#888" fontSize={11} tickLine={false} tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toString()} />
                                                 <Tooltip
                                                     contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '12px' }}
-                                                    formatter={(value: any, name: any) => [value >= 1000000 ? `${(value / 1000000).toFixed(2)}M` : `${(value / 1000).toFixed(1)}K`, name]}
+                                                    formatter={(value: any, name: any) => [value >= 1000000 ? `${(value / 1000000).toFixed(2)}M` : value >= 1000 ? `${(value / 1000).toFixed(1)}K` : value.toString(), name]}
                                                 />
                                                 <Area type="monotone" dataKey="organic" name="Organic" stroke="#22c55e" strokeWidth={2} fill="url(#organicGrad)" />
                                                 <Area type="monotone" dataKey="direct" name="Direct" stroke="#6366f1" strokeWidth={2} fill="url(#directGrad)" />
@@ -525,10 +550,10 @@ export const AnalyticsDashboard = () => {
                                                     </defs>
                                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                                                     <XAxis dataKey="month" stroke="#888" fontSize={10} tickLine={false} />
-                                                    <YAxis stroke="#888" fontSize={10} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
+                                                    <YAxis stroke="#888" fontSize={10} tickLine={false} tickFormatter={(v) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v.toString()} />
                                                     <Tooltip
                                                         contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px' }}
-                                                        formatter={(value: any) => [`${(value / 1000).toFixed(1)}K domains`, 'Referring']}
+                                                        formatter={(value: any) => [value >= 1000 ? `${(value / 1000).toFixed(1)}K domains` : `${value} domains`, 'Referring']}
                                                     />
                                                     <Area type="monotone" dataKey="domains" stroke="#06b6d4" strokeWidth={2} fill="url(#backlinkGrad)" />
                                                 </AreaChart>

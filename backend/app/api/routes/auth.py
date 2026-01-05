@@ -30,8 +30,8 @@ async def google_callback(code: str, state: str = None):
     try:
         success = await google_metrics.handle_callback(code, settings.GOOGLE_REDIRECT_URI)
         if success:
-            return {"status": "success", "message": "Google account connected successfully! You can now access real SEO data."}
-        return {"status": "error", "message": "Failed to connect Google account."}
+            return RedirectResponse(f"{settings.FRONTEND_URL}/dashboard/analytics?gsc=success")
+        return RedirectResponse(f"{settings.FRONTEND_URL}/dashboard/analytics?gsc=error")
     except Exception as e:
         logger.error(f"Error in Google callback: {e}")
         raise HTTPException(status_code=500, detail=str(e))

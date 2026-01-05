@@ -28,6 +28,7 @@ out/
 
 # Static Credentials
 google-credentials.json
+google-tokens.json
 
 # Vercel Configuration (Ignore local build outputs)
 .vercel/

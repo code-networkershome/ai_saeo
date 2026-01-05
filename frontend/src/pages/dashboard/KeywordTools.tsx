@@ -267,6 +267,47 @@ export const KeywordTools = () => {
                                     </p>
                                 </div>
                             </div>
+
+                            {results.top_10_competition && (
+                                <div className="premium-card !p-0 overflow-hidden">
+                                    <div className="p-6 border-b border-border/50">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-time SERP Competition</h3>
+                                    </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-secondary/20">
+                                                    <th className="p-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground w-12 text-center">Pos</th>
+                                                    <th className="p-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground">Domain / Authority</th>
+                                                    <th className="p-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground">Content Title</th>
+                                                    <th className="p-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground w-10"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {results.top_10_competition.map((comp: any, i: number) => (
+                                                    <tr key={i} className="border-b border-border/10 hover:bg-secondary/10 transition-colors">
+                                                        <td className="p-4 text-xs font-black text-muted-foreground text-center">{comp.position}</td>
+                                                        <td className="p-4">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-bold">{comp.domain}</span>
+                                                                {comp.is_authority && (
+                                                                    <span className="text-[8px] font-black text-primary uppercase tracking-tighter">High Authority</span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="p-4 text-xs font-medium text-muted-foreground truncate max-w-xs">{comp.title}</td>
+                                                        <td className="p-4">
+                                                            <a href={comp.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                                                                <ArrowRight className="w-4 h-4" />
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 )}
