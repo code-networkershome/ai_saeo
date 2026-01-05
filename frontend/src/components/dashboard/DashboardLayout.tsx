@@ -8,7 +8,7 @@ import { ChatAssistant } from './ChatAssistant';
 
 export const DashboardLayout = () => {
     const { user } = useAuth();
-    const [isChatOpen, setIsChatOpen] = React.useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     return (
         <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
