@@ -8,11 +8,11 @@ interface Message {
 }
 
 interface ChatAssistantProps {
-    isOpen: boolean;
-    onClose: () => void;
+    // No external props for managing open/close state
 }
 
-export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose }) => {
+export const ChatAssistant: React.FC<ChatAssistantProps> = () => {
+    const [isOpen, setIsOpen] = useState(false); // Internal state for managing visibility
     const [messages, setMessages] = useState<Message[]>([
         { role: 'assistant', content: 'Hi! I\'m your SAEO Intelligence Assistant. I can answer questions about your previous audits, visibility trends, or general AEO strategies. How can I help today?' }
     ]);
@@ -36,8 +36,10 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose })
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setIsLoading(true);
 
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000/api/v1' : '/api/v1');
+
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1'}/chat/`, {
+            const response = await fetch(`${apiUrl}/chat/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
