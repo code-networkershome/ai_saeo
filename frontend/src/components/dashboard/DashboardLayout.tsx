@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Bell, Search, Sparkles } from 'lucide-react';
@@ -7,11 +8,12 @@ import { ChatAssistant } from './ChatAssistant';
 
 export const DashboardLayout = () => {
     const { user } = useAuth();
+    const [isChatOpen, setIsChatOpen] = React.useState(false);
 
     return (
         <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
             {/* Unified Sidebar */}
-            <Sidebar />
+            <Sidebar onToggleChat={() => setIsChatOpen(!isChatOpen)} isChatOpen={isChatOpen} />
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-w-0 bg-[#fdfdfd] dark:bg-background relative">
@@ -70,7 +72,7 @@ export const DashboardLayout = () => {
                 </main>
 
                 {/* Chat Assistant */}
-                <ChatAssistant />
+                <ChatAssistant isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
                 {/* Footer Status Bar */}
                 <footer className="h-10 border-t border-border/40 bg-card/10 backdrop-blur-md px-6 flex items-center justify-between text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">

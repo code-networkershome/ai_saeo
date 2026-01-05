@@ -10,11 +10,17 @@ import {
     Cpu,
     BarChart3,
     Activity,
-    Sparkles
+    Sparkles,
+    Bot
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-export const Sidebar = () => {
+interface SidebarProps {
+    onToggleChat?: () => void;
+    isChatOpen?: boolean;
+}
+
+export const Sidebar = ({ onToggleChat, isChatOpen }: SidebarProps) => {
     const { signOut } = useAuth();
 
     const menuItems = [
@@ -54,6 +60,16 @@ export const Sidebar = () => {
                             <div className={`ml-auto w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity`} />
                         </NavLink>
                     ))}
+
+                    {/* AI Co-Pilot Toggle */}
+                    <button
+                        onClick={onToggleChat}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group ${isChatOpen ? 'bg-indigo-500/10 text-indigo-500 shadow-sm' : 'text-muted-foreground hover:bg-indigo-500/5 hover:text-indigo-400'}`}
+                    >
+                        <Bot className={`w-5 h-5 transition-transform group-hover:scale-110 ${isChatOpen ? 'text-indigo-500' : 'text-indigo-400'}`} />
+                        <span className="text-xs font-bold tracking-tight">AI Co-Pilot</span>
+                        <div className={`ml-auto w-1 h-1 rounded-full bg-indigo-500 ${isChatOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`} />
+                    </button>
                 </nav>
 
                 {/* Pro Status Upgrade Card */}
