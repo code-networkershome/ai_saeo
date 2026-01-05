@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../../lib/api';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -36,27 +37,15 @@ export const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onClose })
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setIsLoading(true);
 
-        const apiUrl = import.meta.env.VITE_API_BASE_URL ||
-            (window.location.hostname === 'localhost' ? 'http://localhost:8000/api/v1' : '/api/v1');
+        setIsLoading(true);
 
         try {
-            const response = await fetch(`${apiUrl.replace(/\/$/, '')}/chat/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: userMsg,
-                    context_domain: localStorage.getItem('last_analyzed_domain') || undefined
-                }),
+            const response = await api.post('/chat/', {
+                message: userMsg,
+                context_domain: localStorage.getItem('last_analyzed_domain') || undefined
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || `Server error: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = response.data;
             setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
         } catch (error: any) {
             console.error('Chat failed:', error);
